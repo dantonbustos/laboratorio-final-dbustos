@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: SonarQube Scan
-        uses: sonarsource/sonarcloud-github-action@v4.0.0
+        uses: sonarsource/sonarcloud-github-action@v2.0.2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   # Ejecutar SCA ->Usar Dependency Check o similar.
@@ -33,16 +33,15 @@ jobs:
   build-image:
     runs-on: ubuntu-latest
     name: Build Docker Image
-    needs: check-sca
+    needs: [check-sast, check-sca]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Build Docker Image
-        id: build-image
         run: |
-          ls -l
-          docker build -f Dockerfile -t nombre:tag
-          echo "Construcción de la Imagen Docker"
+          docker build -t $IMAGE_NAME:${{ github.sha }} .
+      - name: Push Docker Image
+        run: docker push $IMAGE_NAME:${{ github.sha }}
   # Image Security -> Usar Trivy o similar.
   check-image-security:
     runs-on: ubuntu-latest
