@@ -7,6 +7,7 @@ jobs:
   # Ejecutar SAST -> Usar SonarCloud o herramienta similar.
   check-sast:
     runs-on: ubuntu-latest
+    name: Exec SAST
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,6 +20,7 @@ jobs:
   # Ejecutar SCA ->Usar Dependency Check o similar.
   check-sca:
     runs-on: ubuntu-latest
+    name: Exec SCA
     needs: check-sast
     steps:
       - uses: actions/checkout@v4
@@ -29,6 +31,7 @@ jobs:
   # Construcción de la Imagen Docker.
   build-image:
     runs-on: ubuntu-latest
+    name: Build Docker Image
     needs: check-sca
     steps:
       - name: Checkout
@@ -42,6 +45,7 @@ jobs:
   # Image Security -> Usar Trivy o similar.
   check-image-security:
     runs-on: ubuntu-latest
+    name: Image Security
     needs: build-image
     steps:
       - name: Checkout code
@@ -78,6 +82,7 @@ jobs:
   # Despliegue de la aplicación -> Puede utilizar Minikube o Docker de su equipo(notebook).
   deploy-container:
     runs-on: ubuntu-latest
+    name: Despliegue Aplicación 
     needs: zap_scan
     steps:
       - name: Checkout
