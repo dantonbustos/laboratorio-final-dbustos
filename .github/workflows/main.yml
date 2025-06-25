@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - staging
+env:
+  IMAGE_NAME: ghcr.io/dantonbustos/devsecops-lab-final      
 jobs:
   # Ejecutar SAST -> Usar SonarCloud o herramienta similar.
   check-sast:
@@ -11,10 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Disabling shallow clones is recommended for improving the relevancy of reporting
           fetch-depth: 0
       - name: SonarQube Scan
-        uses: sonarsource/sonarcloud-github-action@v4.0.0 # Ex: v4.0.0, See the latest version at https://github.com/marketplace/actions/sonarcloud-scan
+        uses: sonarsource/sonarcloud-github-action@v4.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   # Ejecutar SCA ->Usar Dependency Check o similar.
@@ -64,7 +65,7 @@ jobs:
   # Análisis DAST -> Usar Owasp ZAP o similar
   zap_scan:
     runs-on: ubuntu-latest
-    name: ZAP Scan
+    name: Exec DAST
     needs: check-image-security
     steps:
       - name: Checkout
@@ -86,7 +87,7 @@ jobs:
     needs: zap_scan
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Build Docker Image
         id: build-image
         run: |
