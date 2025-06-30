@@ -4,7 +4,7 @@ on:
     branches:
       - staging
 env:
-  IMAGE_NAME: ghcr.io/dantonbustos/devsecops-lab-final      
+  IMAGE_NAME: ${{ vars.DOCKERHUB_USERNAME }}/devsecops-lab-final      
 jobs:
   # Ejecutar SAST -> Usar SonarCloud o herramienta similar.
   check-sast:
@@ -51,11 +51,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Build an image from Dockerfile
-        run: docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+        run: docker build -t $IMAGE_NAME:${{ github.sha }} .
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
+          image-ref: '${{ env.IMAGE_NAME }}:${{ github.sha }}'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
