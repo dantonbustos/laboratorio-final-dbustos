@@ -37,9 +37,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Docker Login
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ vars.DOCKERHUB_USERNAME }}" --password-stdin
       - name: Build Docker Image
-        run: |
-          docker build -t $IMAGE_NAME:${{ github.sha }} .
+        run: docker build -t $IMAGE_NAME:${{ github.sha }} .
       - name: Push Docker Image
         run: docker push $IMAGE_NAME:${{ github.sha }}
   # Image Security -> Usar Trivy o similar.
@@ -50,8 +51,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Build an image from Dockerfile
-        run: docker build -t $IMAGE_NAME:${{ github.sha }} .
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
@@ -90,5 +89,5 @@ jobs:
       - name: Build Docker Image
         id: build-image
         run: |
-          ls -l
-          docker build -f Dockerfile -t nombre:tag
+          docker pull $IMAGE_NAME:${{ github.sha }}
+          docker run -d -p 8080:80 --name devsecops-app $IMAGE_NAME:${{ github.sha }}
