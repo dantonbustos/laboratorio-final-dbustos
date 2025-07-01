@@ -67,6 +67,8 @@ jobs:
     name: Exec DAST
     needs: check-image-security
     steps:
+      - name: Eliminar contenedor previo si existe
+        run: docker rm -f devsecops-app || true
       - name: Build Docker Image
         id: build-image
         run: |
