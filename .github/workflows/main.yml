@@ -70,10 +70,14 @@ jobs:
       - name: Build Docker Image
         id: build-image
         run: |
-          docker run -d -p 8080:80 --name devsecops-app $IMAGE_NAME:${{ github.sha }}
-      - name: Sleep
+          docker run --rm -d -p 8080:80 --name devsecops-app $IMAGE_NAME:${{ github.sha }}
+      - name: Esperar app
         run: |
-          sleep 30
+          for i in {1..10}; do
+            curl -s http://localhost:8080 && break
+            echo "Chequeando si la App esta disponible..."
+            sleep 5
+          done
       - name: OWASP ZAP
         uses: zaproxy/action-baseline@v0.11.0
         with:
